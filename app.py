@@ -20,7 +20,7 @@ def take_screenshot(html_file: str, screenshot_file: str, executable_path: None|
             headless=True,
             executable_path=executable_path
         )
-        page = browser.new_page()
+        page = browser.new_page(device_scale_factor=2)
         page.goto(html_file)
 
         iframe = page.locator("#twitter-widget-0")
