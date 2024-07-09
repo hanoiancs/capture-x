@@ -2,6 +2,7 @@
 
 ```bash
 python -m pip install -r requirements.txt
+mv .env.example .env
 ```
 
 ##### 1. Run

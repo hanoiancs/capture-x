@@ -14,16 +14,19 @@ def get_embed_code(tweet_url: str) -> str:
     return None
 
 
-def take_screenshot(html_file: str, screenshot_file: str) -> None:
+def take_screenshot(html_file: str, screenshot_file: str, executable_path: None|str = None) -> None:
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            executable_path=executable_path
+        )
         page = browser.new_page()
         page.goto(html_file)
 
         iframe = page.locator("#twitter-widget-0")
         
-        page.wait_for_load_state('domcontentloaded')
-        page.wait_for_timeout(2000)
+        page.wait_for_load_state("domcontentloaded")
+        page.wait_for_load_state("networkidle")
 
         iframe.screenshot(path=screenshot_file)
 
@@ -39,12 +42,13 @@ def get_tweet_id(tweet_url: str) -> str:
         return exploded_path[1]
     return None
     
-def capture(tweet_url: str) -> bool:
-    pass
 
 if __name__ == "__main__":
     import os
     import sys
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
     logging.basicConfig(
         level=logging.INFO,
@@ -73,7 +77,11 @@ if __name__ == "__main__":
 
         logging.info("Start browser to render embed code as HTML.")
         
-        take_screenshot(html_file=f"file://{html_file}", screenshot_file=screenshot_file)
+        take_screenshot(
+            html_file=f"file://{html_file}", 
+            screenshot_file=screenshot_file,
+            executable_path=os.getenv("CHROMIUM_EXECUTABLE_PATH")
+        )
 
         logging.info(f"Embed: {html_file}")
         logging.info(f"Image: {screenshot_file}")
